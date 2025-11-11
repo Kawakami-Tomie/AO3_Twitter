@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>聊天界面</title>
+  <style>
+    /* 基础样式重置 */
+    #workskin body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      color: #181818;
+    }
+
+    #workskin p {
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    /* 手机容器样式，模拟手机外观 */
+    #workskin .phone-container {
+      width: 310px;
+      height: 660px;
+      margin: 30px auto;
+      background: #fff;
+      border: 1px solid #cccccc;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    #workskin .phone-screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 头部样式 */
+    #workskin .group-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background-color: #fff;
+      padding: 12px 16px;
+      border-bottom: 1px solid #dcdcdc;
+
+    }
+
+    #workskin .group-info-left {
+      display: flex;
+      align-items: center;
+
+    }
+
+    #workskin .leftarrow {
+      transform: rotate(135deg);
+      cursor: pointer;
+      border: solid black;
+      border-width: 0 3px 3px 0;
+      display: inline-block;
+      padding: 3px;
+      margin-right: 13px;
+    }
+
+
+    #workskin .author-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-right: 13px;
+    }
+
+    #workskin .top-author-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #252424;
+      margin-right: 13px;
+    }
+
+
+
+    #workskin .top-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* 消息滚动区域 */
+    #workskin .scrollable-content {
+      overflow-y: auto;
+      padding: 10px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      /* gap: 10px; */
+    }
+
+    /* 日期分隔 */
+    #workskin .date-separator {
+      align-self: center;
+      font-size: 13px;
+      font-weight: 550;
+      color: #252424;
+      margin-top: 15px;
+      margin-bottom: 6px;
+    }
+
+    /* 消息气泡通用样式 */
+    #workskin .message {
+      max-width: 75%;
+      font-size: 14px;
+      line-height: 1.4;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    /* 对方消息气泡 */
+    #workskin .message.other {
+      background-color: #F0F2F5;
+      color: #252424;
+      align-self: flex-start;
+      border-radius: 20px;
+      border-bottom-left-radius: 5px;
+      padding: 10px 15px;
+    }
+
+    /* 己方消息气泡 */
+    #workskin .message.mine {
+      background-color: #0095FF;
+      color: white;
+      align-self: flex-end;
+      border-radius: 20px;
+      border-bottom-right-radius: 5px;
+      padding: 10px 15px;
+    }
+
+    /* 引用消息气泡 */
+    #workskin .message.other-quoteother {
+      background-color: white;
+      color: #757575;
+      align-self: flex-start;
+      border: 1px solid #eee;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    /* 引用消息气泡 */
+    #workskin .message.mine-quoteother {
+      background-color: white;
+      color: #757575;
+      align-self: flex-end;
+      border: 1px solid #eee;
+      padding: 8px;
+      border-radius: 10px;
+      max-width: 38%;
+    }
+
+
+
+    #workskin .quote-header {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    /* 回复图片消息 */
+    #workskin .mineimage {
+      width: 100%;
+      margin: 0px 0;
+      align-self: flex-end;
+      display: flex;
+      justify-content: center;
+      margin-top: 5px;
+      margin-bottom: 0;
+
+    }
+
+    #workskin .mineimage img {
+      max-width: 100%;
+      height: auto;
+      border: none;
+      border-radius: 10px;
+    }
+
+
+    /* 图片消息 */
+    #workskin .message.mine-image {
+      width: 56%;
+      margin: 0px 0;
+      align-self: flex-end;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+
+    }
+
+    #workskin .message.mine-image img {
+      max-width: 100%;
+      height: auto;
+      border: none;
+      border-radius: 20px;
+    }
+
+    #workskin .message.other-image {
+      width: 56%;
+      margin: 0px 0;
+      align-self: flex-start;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+
+    }
+
+    #workskin .message.other-image img {
+      max-width: 100%;
+      height: auto;
+      border: none;
+      border-radius: 20px;
+
+    }
+
+    /* 时间样式 */
+    #workskin .time {
+      font-size: 12px;
+      color: #ccc;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    #workskin .forum-container {
+      width: 310px;
+      height: 660px;
+      margin: 30px auto;
+      background: #fff;
+      border: 1px solid #cccccc;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    #workskin .twi-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #workskin .twi-scrollable-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffff;
+    }
+
+    #workskin .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to right, #333, #999);
+      color: #fff;
+      padding: 10px 15px;
+      box-sizing: border-box;
+    }
+
+    #workskin .back-btn {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    #workskin .middle-section {
+      text-align: center;
+    }
+
+    #workskin .title {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    #workskin .post-count {
+      font-size: 14px;
+      margin: 5px 0 0 0;
+      opacity: 0.8;
+    }
+
+    #workskin .follow-btn {
+      background-color: #fff;
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      padding: 7px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #workskin .tab-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    #workskin .active-tab {
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    #workskin .inactive-tab {
+      color: #666;
+      font-size: 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    #workskin .user-info {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    #workskin .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    #workskin .user-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    #workskin .user-handle {
+      color: #657786;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    #workskin .post-text {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    #workskin .post-image {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    #workskin .post-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #657786;
+      font-size: 14px;
+    }
+
+    #workskin .interaction-container {
+      width: 290px;
+      margin: 20px auto;
+      padding: 10px 0;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    #workskin .interaction-data {
+      display: flex;
+      align-items: center;
+    }
+
+    #workskin .interaction-item {
+      margin-right: 12px;
+      flex-direction: row;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #workskin .number {
+      font-weight: bold;
+      color: #222;
+    }
+
+    #workskin .texts {
+      color: #666;
+    }
+
+    #workskin .comments {
+      margin-top: 0;
+    }
+
+    #workskin .comment-divider {
+      height: 1px;
+      background-color: #eee;
+      margin: 20px 0px;
+      width: 290px;
+      margin-left: 0px;
+    }
+
+    #workskin .comment {
+      display: flex;
+      margin-bottom: 15px;
+      padding-bottom: 0px;
+      position: relative;
+      border: none !important;
+      box-shadow: none !important;
+      background-color: transparent !important;
+    }
+
+    #workskin .comment-image {
+      max-width: 83%;
+      border-radius: 12px;
+      margin-bottom: 0;
+      align-self: flex-end;
+      margin-left: auto;
+      display: block;
+    }
+
+    #workskin .comment-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+
+
+    #workskin .comment-content {
+      flex-grow: 1;
+      align-self: flex-end;
+      margin-left: auto;
+      display: block;
+      max-width: 83%;
+    }
+
+    #workskin .comment-header {
+      margin-bottom: 5px;
+    }
+
+    #workskin .comment-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    #workskin .comment-handle {
+      color: #657786;
+      font-size: 14px;
+    }
+
+    #workskin .comment-time {
+      color: #657786;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    #workskin .comment-reply-line {
+      font-size: 12px;
+      color: #657786;
+      margin-bottom: 5px;
+    }
+
+    #workskin .comment-reply-line a {
+      color: #1da1f2;
+      text-decoration: none;
+    }
+
+    #workskin .comment-text {
+      font-size: 14px;
+      line-height: 1.4;
+
+    }
+  </style>
+</head>
+
+<body>
+  <div id="workskin">
+    <div class="forum-container">
+      <div class="twi-screen">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+          <!-- 左侧返回按钮 -->
+          <div class="left-section">
+            <div class="back-btn">← </div>
+          </div>
+          <!-- 中间标题区域 -->
+          <div class="middle-section">
+            <h1 class="title">Markk_</h1>
+            <p class="post-count">1,823 个帖子</p>
+          </div>
+          <!-- 右侧关注按钮 -->
+          <div class="right-section">
+            <div class="follow-btn">关注</div>
+          </div>
+        </div>
+
+        <!-- 下方标签栏 -->
+        <div class="tab-bar">
+          <div class="active-tab">帖子</div>
+          <div class="inactive-tab">回复</div>
+          <div class="inactive-tab">媒体</div>
+        </div>
+
+        <div class="twi-scrollable-content">
+          <!-- 帖子内容 -->
+          <div class="user-info">
+            <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+            <div>
+              <div class="user-name">Markk_</div>
+              <div class="user-handle">@maboooq</div>
+            </div>
+          </div>
+
+          <!-- 帖子文字内容 -->
+          <div class="post-text">今天又练了</div>
+
+          <!-- 帖子图片 -->
+          <img src="https://archive.org/download/zklsisiter/4.jpg" alt="帖子图片" class="post-image" />
+
+          <!-- 时间与互动数据 -->
+          <div class="post-meta">
+            <div>19:13 下午 · 02 8月 25</div>
+          </div>
+
+          <div class="interaction-container">
+            <div class="interaction-data">
+              <div class="interaction-item">
+                <span class="number">356</span>
+                <span class="texts">转推</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">43</span>
+                <span class="texts">引用推文</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">1,453</span>
+                <span class="texts">喜欢</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 评论区 - 推特风格 -->
+          <div class="comments">
+
+            <!-- 评论1 -->
+            <div class="comment">
+              <img src="https://archive.org/download/zklsisiter/11.jpg" alt="zkl" class="comment-avatar" />
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-name">lululule</span>
+                  <span class="comment-handle">@zkkl_</span>
+                  <span class="comment-time">· 7s</span>
+                </div>
+                <!-- 这行改为放在昵称下面单独一行 -->
+                <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                <div class="comment-text">哥哥好帅🥵好涩的青筋和手指😍查我学历好不好🤤</div>
+              </div>
+            </div>
+
+            <!-- 评论分隔线 -->
+            <div class="comment-divider"></div>
+
+          </div>
+
+          <!-- 帖子内容 -->
+          <div class="user-info">
+            <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+            <div>
+              <div class="user-name">Markk_</div>
+              <div class="user-handle">@maboooq</div>
+            </div>
+          </div>
+
+          <!-- 帖子文字内容 -->
+          <div class="post-text">wow！准备约会✌</div>
+
+
+          <!-- 帖子图片 -->
+          <img src="https://archive.org/download/zklsisiter/6.jpg" alt="帖子图片" class="post-image" />
+
+          <!-- 时间与互动数据 -->
+          <div class="post-meta">
+            <div>13:24 下午 · 04 8月 25</div>
+          </div>
+
+          <div class="interaction-container">
+            <div class="interaction-data">
+              <div class="interaction-item">
+                <span class="number">472</span>
+                <span class="texts">转推</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">36</span>
+                <span class="texts">引用推文</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">1,053</span>
+                <span class="texts">喜欢</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 评论区 - 推特风格 -->
+          <div class="comments">
+
+            <!-- 评论1 -->
+            <div class="comment">
+              <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="comment-avatar" />
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-name">Markk_</span>
+                  <span class="comment-handle">@maboooq</span>
+                  <span class="comment-time">· 10s</span>
+                </div>
+                <!-- 这行改为放在昵称下面单独一行 -->
+                <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                <div class="comment-text">在家和自己约会啦😎</div>
+              </div>
+            </div>
+
+
+
+
+
+            <!-- 评论分隔线 -->
+            <div class="comment-divider"></div>
+
+            <!-- 评论3 -->
+            <div class="comment">
+              <img src="https://ia801003.us.archive.org/4/items/zklsisiter/11.jpg" alt="zkl" class="comment-avatar" />
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-name">lululule</span>
+                  <span class="comment-handle">@zkkkl_</span>
+                  <span class="comment-time">· 7s</span>
+                </div>
+                <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                <div class="comment-text">吓死我了老公😭人家真没功夫陪你闹了</div>
+              </div>
+            </div>
+
+            <!-- 评论分隔线 -->
+            <div class="comment-divider"></div>
+
+            <!-- 帖子内容 -->
+            <div class="user-info">
+              <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+              <div>
+                <div class="user-name">Markk_</div>
+                <div class="user-handle">@maboooq</div>
+              </div>
+            </div>
+
+            <!-- 帖子文字内容 -->
+            <div class="post-text">每天早上醒来就这样 好难受 求榨</div>
+
+            <!-- 帖子图片 -->
+            <img src="https://archive.org/download/zklsisiter/5.jpg" alt="帖子图片" class="post-image" />
+
+            <!-- 时间与互动数据 -->
+            <div class="post-meta">
+              <div>10:13 上午 · 10 8月 25</div>
+            </div>
+
+            <div class="interaction-container">
+              <div class="interaction-data">
+                <div class="interaction-item">
+                  <span class="number">276</span>
+                  <span class="texts">转推</span>
+                </div>
+                <div class="interaction-item">
+                  <span class="number">73</span>
+                  <span class="texts">引用推文</span>
+                </div>
+                <div class="interaction-item">
+                  <span class="number">1,240</span>
+                  <span class="texts">喜欢</span>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- 评论区 - 推特风格 -->
+            <div class="comments">
+
+              <!-- 评论1 -->
+              <div class="comment">
+                <img src="https://archive.org/download/zklsisiter/11.jpg" alt="zkl" class="comment-avatar" />
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-name">lululule</span>
+                    <span class="comment-handle">@zkkl_</span>
+                    <span class="comment-time">· 7s</span>
+                  </div>
+                  <!-- 这行改为放在昵称下面单独一行 -->
+                  <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                  <div class="comment-text">求插😚好大好棒啊哥哥🫣这腰感觉爆操一个小时都不会累🥵</div>
+                </div>
+              </div>
+
+              <!-- 评论分隔线 -->
+              <div class="comment-divider"></div>
+
+            </div>
+
+            <!-- 帖子内容 -->
+            <div class="user-info">
+              <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+              <div>
+                <div class="user-name">Markk_</div>
+                <div class="user-handle">@maboooq</div>
+              </div>
+            </div>
+
+            <!-- 帖子文字内容 -->
+            <div class="post-text">虽然我18岁，可我鸡巴19cm啊✌好几把硬好想操b</div>
+
+            <!-- 帖子图片 -->
+            <img src="https://archive.org/download/zklsisiter/3.jpg" alt="帖子图片" class="post-image" />
+
+            <!-- 时间与互动数据 -->
+            <div class="post-meta">
+              <div>04:39 下午 · 12 8月 25</div>
+            </div>
+
+            <div class="interaction-container">
+              <div class="interaction-data">
+                <div class="interaction-item">
+                  <span class="number">349</span>
+                  <span class="texts">转推</span>
+                </div>
+                <div class="interaction-item">
+                  <span class="number">69</span>
+                  <span class="texts">引用推文</span>
+                </div>
+                <div class="interaction-item">
+                  <span class="number">1,714</span>
+                  <span class="texts">喜欢</span>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- 评论区 - 推特风格 -->
+            <div class="comments">
+
+              <!-- 评论1 -->
+              <div class="comment">
+                <img src="https://archive.org/download/zklsisiter/11.jpg" alt="zkl" class="comment-avatar" />
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-name">lululule</span>
+                    <span class="comment-handle">@zkkl_</span>
+                    <span class="comment-time">· 18s</span>
+                  </div>
+                  <!-- 这行改为放在昵称下面单独一行 -->
+                  <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                  <div class="comment-text">卧槽原来是弟弟🫢涩死我了看的我湿惹😿给你发b照了💕弟弟怎么不回人家私信呀</div>
+                </div>
+              </div>
+
+              <!-- 评论分隔线 -->
+              <div class="comment-divider"></div>
+
+            </div>
+
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+
+
+
+    <div class="phone-container">
+      <div class="phone-screen">
+
+        <!-- 头部区域 -->
+        <div class="group-info">
+          <div class="group-info-left">
+            <div class="leftarrow"></div>
+            <img src="https://archive.org/download/zklsisiter/11.jpg" alt="zkl" class="author-icon" />
+            <div class="top-author-name">lululule</div>
+          </div>
+
+        </div>
+
+        <!-- 聊天内容区域 -->
+        <div class="scrollable-content">
+
+          <div class="date-separator">星期六, 八月02</div>
+
+          <div class="message other">
+            <div class="text">哥哥我好喜欢你的身材🤤在床上一定很猛吧🥵光是想想人家小逼就痒痒的😿</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">[自动回复] 不约 直男</div>
+          </div>
+
+
+          <div class="message other">
+            <div class="text">不约的话可以从恋爱开始哒😚老公你单身吗</div>
+          </div>
+
+
+          <div class="date-separator">星期一, 八月04</div>
+
+          <div class="message other">
+            <div class="text">卧槽老公你和谁约会！你谈恋爱了吗？？</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">[自动回复] 不约 直男</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">补药啊老公😭我可以当小三吗</div>
+          </div>
+
+          <div class="date-separator">星期日, 八月10</div>
+
+          <div class="message other">
+            <div class="text">哥哥太帅了啊啊啊鸡巴好大🤤大早上人家也看得流水😿</div>
+          </div>
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/7.jpg" alt="image">
+          </div>
+          <div class="message mine">
+            <div class="text">[自动回复] 不约 直男</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/8.jpg" alt="image">
+          </div>
+
+          <div class="message other">
+            <div class="text">喜欢吗哥哥💕我可以用猫爪爪把哥哥的大鸡巴踩射喔🥵</div>
+          </div>
+
+          <div class="date-separator">星期二, 八月12</div>
+
+          <div class="message other">
+            <div class="text">弟弟... ...</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/9.jpg" alt="image">
+          </div>
+
+          <div class="message other">
+            <div class="text">好爽...小逼好想被弟弟的大鸡巴操</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">说过了不约。</div>
+            <div class="time">04:52 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">卧槽不是自动回复？？？！！！</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/10.jpg" alt="image">
+          </div>
+
+          <div class="message other">
+            <div class="text">喜欢少妇吗弟弟🫣不试试怎么知道爽不爽🫢</div>
+          </div>
+
+
+          <div class="message mine">
+            <div class="text">头像是本人吗？</div>
+            <div class="time">04:53 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">是本人呀~</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/21.jpg" alt="image">
+          </div>
+
+          <div class="message other">
+            <div class="text">怎么样😉对我感兴趣吗弟弟😚</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">哥们儿</div>
+          </div>
+
+          <div class="message mine-quoteother">
+            <div class="quote-header">回复</div>
+            <div class=" mineimage">
+              <img src="https://archive.org/download/zklsisiter/8.jpg" alt="image">
+            </div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">这张鸡巴没截掉</div>
+            <div class="time">04:55 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">不是...🥲</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">我可以女装😿</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">所以脸是本人吗</div>
+            <div class="time">04:56 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">脸是本人...弟弟</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">好，可以约</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">身材我也很喜欢</div>
+            <div class="time">04:57 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">真的吗弟弟🥹你不是直男吗</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">怎么，你们这种不是最喜欢吃直男吗</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">天天私信骚扰我的时候就没想过我是直男吗？姐姐🥺</div>
+          </div>
+
+          <div class="message mine-image">
+            <img src="https://archive.org/download/zklsisiter/17.jpg" alt="image">
+          </div>
+
+          <div class="message mine">
+            <div class="text">不约直男吗？姐姐🥺</div>
+          </div>
+
+          <div class="message mine-image">
+            <img src="https://archive.org/download/zklsisiter/15.jpg" alt="image">
+          </div>
+
+          <div class="message mine">
+            <div class="text">姐姐湿了吗🥺不要背着我偷偷摸小逼哦</div>
+            <div class="time">05:02 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">老公...人家逼逼好痒</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">想立马被弟弟的大鸡巴干穿😿想当弟弟的小骚狗</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">亩狗，看看逼</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">自己抠，录视频给我看</div>
+            <div class="time">05:08 下午·已读</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/13.jpg" alt="image">
+          </div>
+
+          <div class="message other">
+            <div class="text">弟弟我的穴好湿...想吃弟弟的鸡鸡...自己扣不够...好痒呜呜呜😿</div>
+          </div>
+
+          <div class="message other-image">
+            <img src="https://archive.org/download/zklsisiter/12.jpg" alt="image">
+          </div>
+
+          <div class="message mine">
+            <div class="text">我好喜欢骚逼，小穴好会吃好会喷</div>
+          </div>
+
+          <div class="message mine">
+            <div class="text">姐姐也很棒哦</div>
+          </div>
+
+          <div class="message mine-image">
+            <img src="https://archive.org/download/zklsisiter/14.jpg" alt="image">
+          </div>
+
+          <div class="message mine">
+            <div class="text">我也射了好多</div>
+            <div class="time">05:15 下午·已读</div>
+          </div>
+
+          <div class="message other">
+            <div class="text">好浪费呜呜呜😿全都射给我的小逼好不好...等不及了</div>
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="forum-container">
+      <div class="twi-screen">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+          <!-- 左侧返回按钮 -->
+          <div class="left-section">
+            <div class="back-btn">← </div>
+          </div>
+          <!-- 中间标题区域 -->
+          <div class="middle-section">
+            <h1 class="title">Markk_</h1>
+            <p class="post-count">1,825 个帖子</p>
+          </div>
+          <!-- 右侧关注按钮 -->
+          <div class="right-section">
+            <div class="follow-btn">关注</div>
+          </div>
+        </div>
+
+        <!-- 下方标签栏 -->
+        <div class="tab-bar">
+          <div class="active-tab">帖子</div>
+          <div class="inactive-tab">回复</div>
+          <div class="inactive-tab">媒体</div>
+        </div>
+
+        <div class="twi-scrollable-content">
+          <!-- 帖子内容 -->
+          <div class="user-info">
+            <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+            <div>
+              <div class="user-name">Markk_</div>
+              <div class="user-handle">@maboooq</div>
+            </div>
+          </div>
+
+          <!-- 帖子文字内容 -->
+          <div class="post-text">姐姐你怎么有根鸡巴</div>
+
+          <!-- 帖子图片 -->
+          <img src="https://archive.org/download/zklsisiter/20.jpg" alt="帖子图片" class="post-image" />
+
+          <!-- 时间与互动数据 -->
+          <div class="post-meta">
+            <div>23:13 下午 · 14 8月 25</div>
+          </div>
+
+          <div class="interaction-container">
+            <div class="interaction-data">
+              <div class="interaction-item">
+                <span class="number">856</span>
+                <span class="texts">转推</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">183</span>
+                <span class="texts">引用推文</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">2,318</span>
+                <span class="texts">喜欢</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 评论区 - 推特风格 -->
+          <div class="comments">
+
+            <!-- 评论1 -->
+            <div class="comment">
+              <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="comment-avatar" />
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-name">Markk_</span>
+                  <span class="comment-handle">@maboooq</span>
+                  <span class="comment-time">· 3s</span>
+                </div>
+                <!-- 这行改为放在昵称下面单独一行 -->
+                <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                <div class="comment-text">都说了不约直男，张康乐笨死了</div>
+              </div>
+            </div>
+
+            <!-- 评论图片 -->
+            <img src="https://archive.org/download/zklsisiter/19.jpg" alt="帖子图片" class="comment-image" />
+
+            <!-- 评论分隔线 -->
+            <div class="comment-divider"></div>
+
+          </div>
+
+          <!-- 帖子内容 -->
+          <div class="user-info">
+            <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="avatar" />
+            <div>
+              <div class="user-name">Markk_</div>
+              <div class="user-handle">@maboooq</div>
+            </div>
+          </div>
+
+          <!-- 帖子文字内容 -->
+          <div class="post-text">好可爱的老婆 又不是第一次穿女装 这次怎么害羞得全身都红红的 一只手给张康乐抠逼很快就被淫水打湿了 他粉粉的阴茎就立在薄薄的肚皮上吐水 快高潮了肉洞把我手指绞得很紧
+            另一只手被他紧紧攥住 可爱得受不了 想要永远埋在老婆的小批里</div>
+
+
+          <!-- 帖子图片 -->
+          <img src="https://archive.org/download/zklsisiter/18.jpg" alt="帖子图片" class="post-image" />
+
+          <!-- 时间与互动数据 -->
+          <div class="post-meta">
+            <div>21:04 下午 · 25 8月 25</div>
+          </div>
+
+          <div class="interaction-container">
+            <div class="interaction-data">
+              <div class="interaction-item">
+                <span class="number">999</span>
+                <span class="texts">转推</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">99</span>
+                <span class="texts">引用推文</span>
+              </div>
+              <div class="interaction-item">
+                <span class="number">9,999</span>
+                <span class="texts">喜欢</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 评论区 - 推特风格 -->
+          <div class="comments">
+
+            <!-- 评论1 -->
+            <div class="comment">
+              <img src="https://archive.org/download/zklsisiter/1.jpg" alt="mbq" class="comment-avatar" />
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-name">Markk_</span>
+                  <span class="comment-handle">@maboooq</span>
+                  <span class="comment-time">· 10s</span>
+                </div>
+                <!-- 这行改为放在昵称下面单独一行 -->
+                <div class="comment-reply-line">回复 <a href="#">@maboooq</a></div>
+                <div class="comment-text">给你们偷偷讲 面基的时候张康乐以为我真的是直男 第一次跟我做穿的女装😉 害怕我接受不了操他屁眼 就穿丝袜给我踩 半透的白丝袜包着张康乐匀称的小腿色情死了
+                  踩射之后乖乖爬过来把精液舔干净说可以操他的嘴 卧槽受不了 鸡巴在他嘴里又肿了一圈 吃不下又努力撑开口腔的样子蠢得要命 把张康乐翻个面撕开裙子就操进小穴里 </div>
+              </div>
+            </div>
+
+
+            <!-- 评论图片 -->
+            <img src="https://archive.org/download/zklsisiter/22.png" alt="帖子图片" class="comment-image" />
+
+
+
+
+            <!-- 评论分隔线 -->
+            <div class="comment-divider"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+  </div>
+</body>
+
+</html>
